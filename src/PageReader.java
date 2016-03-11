@@ -1,5 +1,6 @@
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,6 +18,7 @@ public class PageReader {
       Elements tableElements = doc.select("table");
       Elements tableRowElements = tableElements.select(":not(thead) tr");
       int[] secretNums = new int[tableRowElements.size()];
+      ArrayList<String> rowData = new ArrayList<String>();
       int rank = -1;
       
   		System.out.print("Please enter your secret number: ");
@@ -29,7 +31,9 @@ public class PageReader {
         if (rowItems.size() > 2) { // 2 is for filtering the upper title, link or images
         	if (rowItems.get(0).text().equals("Secret Number")) {
         		for (int j = 0; j < rowItems.size(); j++) {
-              System.out.print(rowItems.get(j).text() + " ");
+      				if (!rowItems.get(j).text().equals("\u00a0")){ // jsoup maps &nbsp; to U+00A0.
+      					System.out.print(rowItems.get(j).text() + " ");
+      				}
             }
         		System.out.println();	
         	}
@@ -38,7 +42,10 @@ public class PageReader {
         		if (secretNums[rowWithData] == userInput) {
         			rank = rowWithData + 1;
         			for (int j = 0; j < rowItems.size(); j++) {
-                System.out.print(rowItems.get(j).text() + " ");   
+        				if (!rowItems.get(j).text().equals("\u00a0")){
+                  System.out.print(rowItems.get(j).text() + " "); 
+                  rowData.add(rowItems.get(j).text());
+        				}
         			}
               System.out.println();
         		}
@@ -50,6 +57,8 @@ public class PageReader {
   		for (int i = 0; i < secretNums.length; i++) {
   			System.out.print(secretNums[i] + " ");
   		}
+  		System.out.println("");
+  		System.out.println(rowData);
   			
    } catch (IOException e) {
       e.printStackTrace();
