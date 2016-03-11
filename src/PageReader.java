@@ -27,24 +27,30 @@ public class PageReader {
         Element row = tableRowElements.get(i);
         Elements rowItems = row.select("td");
         if (rowItems.size() > 2) { // 2 is for filtering the upper title, link or images
-        	if (rowItems.get(0).text().length() == 4) {
+        	if (rowItems.get(0).text().equals("Secret Number")) {
+        		for (int j = 0; j < rowItems.size(); j++) {
+              System.out.print(rowItems.get(j).text() + " ");
+            }
+        		System.out.println();	
+        	}
+        	else if (rowItems.get(0).text().length() == 4) {
         		secretNums[rowWithData] = Integer.parseInt(rowItems.get(0).text()); 
         		if (secretNums[rowWithData] == userInput) {
         			rank = rowWithData + 1;
-        		}
-        		rowWithData++;
-        		if (userInput == Integer.parseInt(rowItems.get(0).text())) {
-              for (int j = 0; j < rowItems.size(); j++) {
+        			for (int j = 0; j < rowItems.size(); j++) {
                 System.out.print(rowItems.get(j).text() + " ");   
-              }
+        			}
               System.out.println();
         		}
+        		rowWithData++;
         	}
         }
       }
-
-      System.out.println("");
   		System.out.println("Your current rank is " + rank);
+  		for (int i = 0; i < secretNums.length; i++) {
+  			System.out.print(secretNums[i] + " ");
+  		}
+  			
    } catch (IOException e) {
       e.printStackTrace();
    } finally {
