@@ -1,5 +1,6 @@
 
 import java.io.IOException;
+import java.util.Scanner;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,27 +12,24 @@ public class PageReader {
 		// TODO Auto-generated method stub
     String link = "http://www.gradesource.com/reports/5108/27681/coursestand.html";
     try {
+  		Scanner scnr = new Scanner(System.in);
+  		System.out.print("Please enter your secret number: ");
+  		int userInput = scnr.nextInt();
       Document doc = Jsoup.connect(link).get();
-  
       Elements tableElements = doc.select("table");
-      /*
-      Elements tableHeaderEles = tableElements.select("thead tr th");
-      System.out.println("headers");
-      for (int i = 0; i < tableHeaderEles.size(); i++) {
-         System.out.println(tableHeaderEles.get(i).text());
-      }
-      System.out.println();
-*/
       Elements tableRowElements = tableElements.select(":not(thead) tr");
+      
       for (int i = 0; i < tableRowElements.size(); i++) {
         Element row = tableRowElements.get(i);
         Elements rowItems = row.select("td");
         if (rowItems.size() > 2) { // 2 is for filtering the upper title, link or images
         	if (rowItems.get(0).text().length() == 4) {
-            for (int j = 0; j < rowItems.size(); j++) {
-            	System.out.print(rowItems.get(j).text() + " ");
-            }
-            System.out.println();
+        		if (userInput == Integer.parseInt(rowItems.get(0).text())) {
+              for (int j = 0; j < rowItems.size(); j++) {
+              	System.out.print(rowItems.get(j).text() + " ");
+              }
+              System.out.println();
+        		}
         	}
         }
       }
