@@ -13,57 +13,55 @@ public class PageReader {
 		// TODO Auto-generated method stub
     String link = "http://www.gradesource.com/reports/5108/27681/coursestand.html";
     Scanner scnr = new Scanner(System.in);
-    try {
-      Document doc = Jsoup.connect(link).get();
-      Elements tableElements = doc.select("table");
-      Elements tableRowElements = tableElements.select(":not(thead) tr");
-      int[] secretNums = new int[tableRowElements.size()];
-      ArrayList<String> rowData = new ArrayList<String>();
-      int rank = -1;
-      
-  		System.out.print("Please enter your secret number: ");
-  		int userInput = scnr.nextInt();
-      
-  		int rowWithData = 0;
-      for (int i = 0; i < tableRowElements.size(); i++) {
-        Element row = tableRowElements.get(i);
-        Elements rowItems = row.select("td");
-        if (rowItems.size() > 2) { // 2 is for filtering the upper title, link or images
-        	if (rowItems.get(0).text().equals("Secret Number")) {
-        		for (int j = 0; j < rowItems.size(); j++) {
-      				if (!rowItems.get(j).text().equals("\u00a0")){ // jsoup maps &nbsp; to U+00A0.
-      					System.out.print(rowItems.get(j).text() + " ");
-      				}
-            }
-        		System.out.println();	
-        	}
-        	else if (rowItems.get(0).text().length() == 4) {
-        		secretNums[rowWithData] = Integer.parseInt(rowItems.get(0).text()); 
-        		if (secretNums[rowWithData] == userInput) {
-        			rank = rowWithData + 1;
-        			for (int j = 0; j < rowItems.size(); j++) {
-        				if (!rowItems.get(j).text().equals("\u00a0")){
-                  System.out.print(rowItems.get(j).text() + " "); 
-                  rowData.add(rowItems.get(j).text());
-        				}
-        			}
-              System.out.println();
-        		}
-        		rowWithData++;
-        	}
-        }
-      }
-  		System.out.println("Your current rank is " + rank);
-  		for (int i = 0; i < secretNums.length; i++) {
-  			System.out.print(secretNums[i] + " ");
-  		}
-  		System.out.println("");
-  		System.out.println(rowData);
-  			
-   } catch (IOException e) {
-      e.printStackTrace();
-   } finally {
-  	 scnr.close();
-   }
+		Document doc = Jsoup.connect(link).get();
+		Elements tableElements = doc.select("table");
+		Elements tableRowElements = tableElements.select(":not(thead) tr");
+		// The 1D size will be over than actual size we put data in.
+		// But not over too much. I think no need to worry to much.
+		String[][] tableData = new String[tableRowElements.size()][];
+		
+		int colWithData = 0; 
+/*
+		System.out.print("Please enter your secret number: ");
+		int userInput = scnr.nextInt();
+		*/
+
+		int rowWithData = 0; // only need data start from the first secret number.
+		for (int i = 0; i < tableRowElements.size(); i++) {
+			Element row = tableRowElements.get(i);
+			Elements rowItems = row.select("td");
+			colWithData = 0; // reset the count of column with data inside.
+			// 2 is for filtering the upper title, link or images
+			if (rowItems.size() > 2) { 
+				// print out table title
+				if (rowItems.get(0).text().equals("Secret Number")) { 
+					for (int j = 0; j < rowItems.size(); j++) {
+						//jsoup mas &nbsp; to U+00A0.
+						if (!rowItems.get(j).text().equals("\u00a0")) {
+							System.out.print(rowItems.get(j).text() + " ");
+						}
+					}
+					System.out.println();
+				} else if (rowItems.get(0).text().length() == 4) {
+					tableData[rowWithData] = new String[rowItems.size()];
+						for (int j = 0; j < rowItems.size(); j++) {
+							if (!rowItems.get(j).text().equals("\u00a0")) {
+								// System.out.print(rowItems.get(j).text() + " ");
+								tableData[rowWithData][colWithData] = rowItems.get(j).text();
+								colWithData++;
+							}	
+						}
+						rowWithData++;
+					}	
+				}
+			}
+		for (int i = 0; i < rowWithData; i++) {
+			for (int j = 0; j < colWithData; j++) {
+				System.out.print(tableData[i][j] + " ");
+			}
+			System.out.println("");
+		}
+		System.out.println(rowWithData);
+		scnr.close();
 	}
 }
