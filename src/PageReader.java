@@ -1,6 +1,6 @@
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,14 +19,10 @@ public class PageReader {
 		// The 1D size will be over than actual size we put data in.
 		// But not over too much. I think no need to worry to much.
 		String[][] tableData = new String[tableRowElements.size()][];
-		
+		HashMap<String, Integer> numMapData = new HashMap<String, Integer>();
 		int colWithData = 0; 
-/*
-		System.out.print("Please enter your secret number: ");
-		int userInput = scnr.nextInt();
-		*/
-
 		int rowWithData = 0; // only need data start from the first secret number.
+		
 		for (int i = 0; i < tableRowElements.size(); i++) {
 			Element row = tableRowElements.get(i);
 			Elements rowItems = row.select("td");
@@ -43,6 +39,7 @@ public class PageReader {
 					}
 					System.out.println();
 				} else if (rowItems.get(0).text().length() == 4) {
+					numMapData.put(rowItems.get(0).text(), rowWithData);
 					tableData[rowWithData] = new String[rowItems.size()];
 						for (int j = 0; j < rowItems.size(); j++) {
 							if (!rowItems.get(j).text().equals("\u00a0")) {
@@ -61,7 +58,19 @@ public class PageReader {
 			}
 			System.out.println("");
 		}
-		System.out.println(rowWithData);
+		System.out.print("Please enter your secret number: ");
+		String userInput = scnr.nextLine();
+		if (numMapData.containsKey(userInput)) {
+			int userRow = numMapData.get(userInput);
+  		for (int j = 0; j < colWithData; j++) {
+  			System.out.print(tableData[userRow][j] + " ");
+  		}
+			System.out.println();
+			// index + 1 is actual rank.
+			System.out.println("Your Current Rank: " + (userRow + 1));
+		} else {
+			System.out.println("Cannot find the number.");
+		}
 		scnr.close();
 	}
 }
