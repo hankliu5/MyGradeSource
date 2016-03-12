@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Optional;
 
 import javafx.application.Application;
@@ -13,12 +14,15 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class OperateGUI extends Application{
-	public void start(Stage primaryStage) { 
+	public void start(Stage primaryStage) throws IOException { 
 		// set up objects
 		Label label1 = new Label("Secret Number:"); 
 		TextField userTextField = new TextField("Enter Your Secret Number here...");
 		Button button1 = new Button("Show Overall");
 		Button quitButton = new Button("Quit");
+		
+		// read the page first.
+		PageReader page = new PageReader();
 		
 		// set up pane
 		GridPane pane1 = new GridPane(); 
@@ -33,7 +37,7 @@ public class OperateGUI extends Application{
 		button1.setOnAction(e -> {
 			String userInput = userTextField.getText();
 			try {
-				new PageReader(userInput);
+				page.searchUser(userInput);
 			} catch (Exception e1) {
 				// IOXlsxFile class can handle the error message itself.
 				// So just leave it empty.
