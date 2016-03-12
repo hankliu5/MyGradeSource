@@ -34,7 +34,6 @@ public class OperateGUI extends Application{
 			String userInput = userTextField.getText();
 			try {
 				new PageReader(userInput);
-				new SecondStage();
 			} catch (Exception e1) {
 				// IOXlsxFile class can handle the error message itself.
 				// So just leave it empty.

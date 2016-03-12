@@ -6,6 +6,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 public class PageReader {
 
 	public PageReader(String userInput) throws IOException{
@@ -59,7 +62,9 @@ public class PageReader {
 			// index + 1 is actual rank.
 			System.out.println("Your Current Rank: " + (userRow + 1));
 		} else {
-			System.out.println("Cannot find the number.");
+			Alert alert = new Alert(AlertType.ERROR, "Cannot find your number.");
+			alert.showAndWait();
+			// System.out.println("Cannot find the number.");
 		}
 	}
 }
