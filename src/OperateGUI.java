@@ -21,19 +21,20 @@ public class OperateGUI extends Application{
 		Button quitButton = new Button("Quit");
 		
 		// set up pane
-		GridPane pane = new GridPane(); 
-		pane.setHgap(5); 
-		pane.setVgap(10); 
-		pane.setPadding(new Insets(2));
-		pane.add(label1, 0, 0);
-		pane.add(userTextField, 1, 0);
-		pane.add(button1, 0, 1);
-		pane.add(quitButton, 1, 1);
+		GridPane pane1 = new GridPane(); 
+		pane1.setHgap(5); 
+		pane1.setVgap(10); 
+		pane1.setPadding(new Insets(2));
+		pane1.add(label1, 0, 0);
+		pane1.add(userTextField, 1, 0);
+		pane1.add(button1, 0, 1);
+		pane1.add(quitButton, 1, 1);
 		// shows overall
 		button1.setOnAction(e -> {
 			String userInput = userTextField.getText();
 			try {
 				new PageReader(userInput);
+				new SecondStage();
 			} catch (Exception e1) {
 				// IOXlsxFile class can handle the error message itself.
 				// So just leave it empty.
@@ -49,16 +50,16 @@ public class OperateGUI extends Application{
 		});
 		
 	// sets a scene for primaryStage.
-			Scene scene = new Scene(pane);
+			Scene scene = new Scene(pane1);
 			primaryStage.setScene(scene);
-			primaryStage.setTitle("Updating Stock WorkSheet"); 
+			primaryStage.setTitle("My GradeSource"); 
 			primaryStage.show();
 
 	}
 
-
 	public static void main(String[] args) throws Exception{
 		launch(args);
 	}
-
 }
+
+
