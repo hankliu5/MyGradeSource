@@ -1,6 +1,13 @@
 
+import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,6 +16,7 @@ import org.jsoup.select.Elements;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -24,7 +32,7 @@ public class PageReader {
 	// But not over too much. I think no need to worry to much.
 	String[][] tableData = new String[tableRowElements.size()][];
 	String[] title;
-	HashMap<String, Integer> numMapData = new HashMap<String, Integer>();
+	Map<String, Integer> numMapData = new HashMap<String, Integer>();
 	int colWithData = 0; 
 	int rowWithData = 0; // only need data start from the first secret number.
 	
@@ -77,7 +85,8 @@ public class PageReader {
 			Dialog<Pair<String, String>> dialog = new Dialog<>();
 			dialog.setTitle("Result");
 			dialog.setHeaderText("Your Current Rank: " + (rankRow + 1) + " / " + rowWithData);
-			dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+			ButtonType showMoreButton = new ButtonType("Show All..", ButtonData.OK_DONE);
+			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE, showMoreButton);
 			GridPane grid = new GridPane();
 			grid.setHgap(10);
 			grid.setVgap(10);
@@ -89,12 +98,50 @@ public class PageReader {
 			}
 			grid.add(new Label("Current Grade: " + userGrade), 0, colWithData + 1);
 			dialog.getDialogPane().setContent(grid);
-			dialog.showAndWait();
+			// allows showMoreButton to open a website on browser. 
+			dialog.setResultConverter(dialogButton -> {
+		    if (dialogButton == showMoreButton) {
+					try {
+						URL sourceURL = new URL(link);
+			    	openWebpage(sourceURL);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		    }
+		    return null;
+		});
+			dialog.showAndWait();		
+		} else if (userInput.equals("demo")) {
+			Random rand = new Random();
+			int randonRank = rand.nextInt(rowWithData);
+			String randonNum = (String) getKeyFromValue(numMapData, randonRank);
+			searchUser(randonNum);
+			
 		} else {
 			Alert alert = new Alert(AlertType.ERROR, "Cannot find your number.");
 			alert.showAndWait();
 		}
 	}
+	
+	public static void openWebpage(URI uri) {
+    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+        try {
+            desktop.browse(uri);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+	}
+	
+  public static void openWebpage(URL url) {
+    try {
+        openWebpage(url.toURI());
+    } catch (URISyntaxException e) {
+        e.printStackTrace();
+    }
+  }
 	
 	public String giveUserGrade(double score) {
 		if (score >= 100) {
@@ -121,4 +168,13 @@ public class PageReader {
 			return "F";
 		}
 	}
+	
+	public static Object getKeyFromValue(Map<String, Integer> hm, int value) {
+    for (Object o : hm.keySet()) {
+      if (hm.get(o).equals(value)) {
+        return o;
+      }
+    }
+    return null;
+  }
 }

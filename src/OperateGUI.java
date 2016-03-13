@@ -17,7 +17,8 @@ public class OperateGUI extends Application{
 	public void start(Stage primaryStage) throws IOException { 
 		// set up objects
 		Label label1 = new Label("Secret Number:"); 
-		TextField userTextField = new TextField("Enter Your Secret Number here...");
+		TextField userTextField = new TextField();
+		userTextField.setPromptText("Enter Your Secret Number here...");
 		Button button1 = new Button("Show Overall");
 		Button quitButton = new Button("Quit");
 		
