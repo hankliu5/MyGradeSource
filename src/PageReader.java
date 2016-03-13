@@ -66,24 +66,59 @@ public class PageReader {
 	public void searchUser(String userInput){
 		if (numMapData.containsKey(userInput)) {
 			int rankRow = numMapData.get(userInput);
+			// the last element is overall score.
+			// Since I increment one on colWithData before finish every loop
+			// I minus 1 on colWithData here.
+			double overallScore = Double.parseDouble
+					(tableData[rankRow][colWithData - 1].replace("%", ""));
+			String userGrade = giveUserGrade(overallScore);
 			
 			// setting a dialog for showing the result.
 			Dialog<Pair<String, String>> dialog = new Dialog<>();
 			dialog.setTitle("Result");
-			dialog.setHeaderText("Your Current Rank: " + (rankRow + 1));
+			dialog.setHeaderText("Your Current Rank: " + (rankRow + 1) + " / " + rowWithData);
 			dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
 			GridPane grid = new GridPane();
 			grid.setHgap(10);
 			grid.setVgap(10);
 			grid.setPadding(new Insets(20, 150, 10, 10));
+			grid.add(new Label("Your number: " + userInput), 0, 0);
 			for (int i = 0; i < colWithData; i++) {
-				grid.add(new Label(title[i] + ": " + tableData[rankRow][i]), 0, i);
+				// secret number already occupied the first row.
+				grid.add(new Label(title[i] + ": " + tableData[rankRow][i]), 0, i + 1);
 			}
+			grid.add(new Label("Current Grade: " + userGrade), 0, colWithData + 1);
 			dialog.getDialogPane().setContent(grid);
 			dialog.showAndWait();
 		} else {
 			Alert alert = new Alert(AlertType.ERROR, "Cannot find your number.");
 			alert.showAndWait();
+		}
+	}
+	
+	public String giveUserGrade(double score) {
+		if (score >= 100) {
+			return "A+";
+		} else if (score >= 93) {
+			return "A";
+		} else if (score >= 90) {
+			return "A-";
+		} else if (score >= 87) {
+			return "B+";
+		} else if (score >= 83) {
+			return "B";
+		} else if (score >= 80) {
+			return "B-";
+		} else if (score >= 77) {
+			return "C+";
+		} else if (score >= 73) {
+			return "C";
+		} else if (score >= 70) {
+			return "C-";
+		} else if (score >= 60) {
+			return "D";
+		} else {
+			return "F";
 		}
 	}
 }
