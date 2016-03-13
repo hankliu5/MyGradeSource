@@ -1,4 +1,3 @@
-
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
@@ -23,6 +22,15 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
+/**
+ * PageReader class allows application to parse table data from GradeSource's
+ * website. This application is only for "overall course standing" page of 
+ * CSE11 since there are minor different between different tables.
+ * 
+ * @author Yu-Chia Liu, Ming-Wei Liu
+ * @email yul560@eng.ucsd.edu, mil228@eng.ucsd.edu
+ *
+ */
 public class PageReader {
 	String link = "http://www.gradesource.com/reports/5108/27681/coursestand.html";
 	Document doc = Jsoup.connect(link).get();
@@ -36,8 +44,11 @@ public class PageReader {
 	int colWithData = 0; 
 	int rowWithData = 0; // only need data start from the first secret number.
 	
+	/**
+	 * Reads and stores table data from the website.
+	 * @throws IOException
+	 */
 	public PageReader() throws IOException{
-		
 		for (int i = 0; i < tableRowElements.size(); i++) {
 			Element row = tableRowElements.get(i);
 			Elements rowItems = row.select("td");
@@ -48,29 +59,41 @@ public class PageReader {
 				if (rowItems.get(0).text().length() == 4) {
 					numMapData.put(rowItems.get(0).text(), rowWithData);
 					tableData[rowWithData] = new String[rowItems.size()];
-						for (int j = 0; j < rowItems.size(); j++) {
-							if (!rowItems.get(j).text().equals("\u00a0")) {
-								if ((rowItems.get(j).text().indexOf("%") != -1)) {
-									tableData[rowWithData][colWithData] = rowItems.get(j).text();
-									colWithData++;
-								}
-							}	
+					// start from the next column to secret number.
+					for (int j = 1; j < rowItems.size(); j++) {
+						// jsoup maps &nbsp; to U+00A0. we don't need empty cell.
+						if (!rowItems.get(j).text().equals("\u00a0")) {
+							// to simplify the type of data. only grab score column.
+							if ((rowItems.get(j).text().indexOf("%") != -1)) {
+								tableData[rowWithData][colWithData] = rowItems.get(j).text();
+								colWithData++;
+							}
 						}
-						rowWithData++;
-					} else if (rowItems.get(0).text().equals("Secret Number")) { 
-  					title = new String[rowItems.size()];
-  					// start from the next column of secret number.
-  					for (int j = 1; j < rowItems.size(); j++) {
-  						//jsoup maps &nbsp; to U+00A0.
-  						if (!rowItems.get(j).text().equals("\u00a0")) {
-  							title[colWithData] = rowItems.get(j).text();
-  							colWithData++;
-  						}
-  					}
-  				} 	
+					}
+					rowWithData++;
+				} else if (rowItems.get(0).text().equals("Secret Number")) {
+					title = new String[rowItems.size()];
+					// start from the next column to secret number.
+					for (int j = 1; j < rowItems.size(); j++) {
+						// jsoup maps &nbsp; to U+00A0.
+						if (!rowItems.get(j).text().equals("\u00a0")) {
+							title[colWithData] = rowItems.get(j).text();
+							colWithData++;
+						}
+					}
 				}
 			}
+		}
 	}
+	
+	/**
+	 * allows main GUI to run the search function.
+	 * if user enter "demo" and run, this method will grab a secret number
+	 * from the map, and then run this method again with grabbed secret number.
+	 * (concept of recursion).
+	 *  
+	 * @param userInput
+	 */
 	public void searchUser(String userInput){
 		if (numMapData.containsKey(userInput)) {
 			int rankRow = numMapData.get(userInput);
@@ -91,7 +114,7 @@ public class PageReader {
 			grid.setHgap(10);
 			grid.setVgap(10);
 			grid.setPadding(new Insets(20, 150, 10, 10));
-			grid.add(new Label("Your number: " + userInput), 0, 0);
+			grid.add(new Label("Secret number: " + userInput), 0, 0);
 			for (int i = 0; i < colWithData; i++) {
 				// secret number already occupied the first row.
 				grid.add(new Label(title[i] + ": " + tableData[rankRow][i]), 0, i + 1);
@@ -111,19 +134,27 @@ public class PageReader {
 		    }
 		    return null;
 		});
-			dialog.showAndWait();		
-		} else if (userInput.equals("demo")) {
+			dialog.showAndWait();	
+		}
+		// if user enters demo, it will grab a random secret number here.
+		else if (userInput.equals("demo")) {
 			Random rand = new Random();
 			int randonRank = rand.nextInt(rowWithData);
 			String randonNum = (String) getKeyFromValue(numMapData, randonRank);
-			searchUser(randonNum);
-			
-		} else {
+			searchUser(randonNum);		
+		} 
+		// if cannot find the number from userInput, show a window alert.
+		else {
 			Alert alert = new Alert(AlertType.ERROR, "Cannot find your number.");
 			alert.showAndWait();
 		}
 	}
 	
+	/**
+	 * Allows application to open source website through user's default browser.
+	 * 
+	 * @param uri
+	 */
 	public static void openWebpage(URI uri) {
     Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
     if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
@@ -135,6 +166,11 @@ public class PageReader {
     }
 	}
 	
+	/**
+	 * Allows application to open source website through user's default browser.
+	 * 
+	 * @param url
+	 */
   public static void openWebpage(URL url) {
     try {
         openWebpage(url.toURI());
@@ -143,6 +179,12 @@ public class PageReader {
     }
   }
 	
+  /**
+   * Uses user's overall score to check user's letter grade.
+   *  
+   * @param score
+   * @return - user's current letter grade.
+   */
 	public String giveUserGrade(double score) {
 		if (score >= 100) {
 			return "A+";
@@ -169,6 +211,13 @@ public class PageReader {
 		}
 	}
 	
+	/**
+	 * gets a random rank number and then switch it into its key.
+	 * 
+	 * @param hm
+	 * @param value
+	 * @return - value's key
+	 */
 	public static Object getKeyFromValue(Map<String, Integer> hm, int value) {
     for (Object o : hm.keySet()) {
       if (hm.get(o).equals(value)) {

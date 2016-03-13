@@ -11,56 +11,81 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/**
+ * This class controls the main GUI that allows users to enter their secret
+ * number and then search their current grade status of CSE11. 
+ * 
+ * This application is only for "overall course standing" page of CSE11 since
+ * there are minor different between different tables. But we think the 
+ * function is enough to reach our primitive goal: allowing users search their
+ * status and current rank of this course.
+ * 
+ * @author Yu-Chia Liu, Ming-Wei Liu
+ * @email yul560@eng.ucsd.edu, mil228@eng.ucsd.edu
+ *
+ */
 public class OperateGUI extends Application{
+	
+	/**
+	 * Default method to start GUI.
+	 */
 	public void start(Stage primaryStage) throws IOException { 
 		// set up objects
 		Label label1 = new Label("Secret Number:"); 
-		TextField userTextField = new TextField();
-		userTextField.setPromptText("Enter Your Secret Number here...");
-		Button button1 = new Button("Show Overall");
+		TextField userTextField = new TextField("Enter Your Secret Number here...");
+		Text t = new Text("(Enter \"demo\" to pick up a random secret number.)");
+		Button showButton = new Button("Show");
 		Button quitButton = new Button("Quit");
+		showButton.setMaxWidth(Double.MAX_VALUE);
+		quitButton.setMaxWidth(Double.MAX_VALUE);
+
 		
-		// read the page first.
+		// reading the table first can make search faster.
 		PageReader page = new PageReader();
 		
 		// set up pane
 		GridPane pane1 = new GridPane(); 
 		pane1.setHgap(5); 
 		pane1.setVgap(10); 
-		pane1.setPadding(new Insets(2));
+		pane1.setPadding(new Insets(10));
 		pane1.add(label1, 0, 0);
 		pane1.add(userTextField, 1, 0);
-		pane1.add(button1, 0, 1);
-		pane1.add(quitButton, 1, 1);
-		// shows overall
-		button1.setOnAction(e -> {
+		pane1.add(t, 1, 1);
+		pane1.add(showButton, 2, 0);
+		pane1.add(quitButton, 2, 1);
+		
+		// sets up the function to show user's grades.
+		showButton.setOnAction(e -> {
 			String userInput = userTextField.getText();
 			try {
 				page.searchUser(userInput);
 			} catch (Exception e1) {
-				// IOXlsxFile class can handle the error message itself.
+				// PageReader class can handle the error message itself.
 				// So just leave it empty.
 			}
 		}); 
 		
+		// sets up the function to close the stage.
 		quitButton.setOnAction(e -> {
-			Alert alert = new Alert(AlertType.CONFIRMATION, "Are you should you want to quit?");
+			Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to quit?");
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == ButtonType.OK){
 				primaryStage.close();
 			}
 		});
 		
-	// sets a scene for primaryStage.
-			Scene scene = new Scene(pane1);
-			primaryStage.setScene(scene);
-			primaryStage.setTitle("My GradeSource"); 
-			primaryStage.show();
+		// sets a scene for primaryStage.
+		Scene scene = new Scene(pane1);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("My GradeSource"); 
+		primaryStage.show();
 
 	}
-
+	
+	// main method to launch the GUI.
 	public static void main(String[] args) throws Exception{
 		launch(args);
 	}
