@@ -25,6 +25,8 @@ import javafx.stage.Stage;
  * 
  * @author Yu-Chia Liu, Ming-Wei Liu
  * @email yul560@eng.ucsd.edu, mil228@eng.ucsd.edu
+ * @compile javac -cp jsoup-1.8.3.jar:. OperateGUI.java
+ * @run java -cp jsoup-1.8.3.jar:. OperateGUI
  *
  */
 public class OperateGUI extends Application{
@@ -86,7 +88,7 @@ public class OperateGUI extends Application{
 	}
 	
 	// main method to launch the GUI.
-	public static void main(String[] args) throws Exception{
+	public static void main(String[] args){
 		launch(args);
 	}
 }
